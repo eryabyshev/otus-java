@@ -1,17 +1,32 @@
+package test.java;
+
+import main.java.ATM;
+import main.java.BanknoteFaceValue;
+import main.java.Cell;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ATMTest {
 
 
 
-    private Map<BanknoteFaceValue, Integer> getMap(Object clazz) throws NoSuchFieldException, IllegalAccessException {
-        Field field = clazz.getClass().getDeclaredField("money");
+    private Map<BanknoteFaceValue, Integer> getMap(Object clazz, String fieldName) throws NoSuchFieldException, IllegalAccessException {
+        Field field = clazz.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         return (Map<BanknoteFaceValue, Integer>) field.get(clazz);
+    }
+
+    private Map<BanknoteFaceValue, Integer> getMap(Object clazz) throws NoSuchFieldException, IllegalAccessException {
+        return getMap(clazz, "money");
+    }
+
+    private Map<BanknoteFaceValue, Integer>getMomentoMap(Object clazz) throws NoSuchFieldException, IllegalAccessException {
+        return getMap(clazz, "backUp");
     }
 
 
@@ -123,6 +138,47 @@ public class ATMTest {
         map.put(BanknoteFaceValue.THOUSAND, 0);
         map.put(BanknoteFaceValue.THOUSAND5, 2);
         Assert.assertFalse(atm.getMoney(1000));
+    }
+
+
+
+    @Test
+    public void initZeroTest() throws NoSuchFieldException, IllegalAccessException {
+        ATM atm = new ATM();
+        Map<BanknoteFaceValue, Integer> map = getMap(atm);
+        Map<BanknoteFaceValue, Integer> backUp = getMomentoMap(atm);
+        Assert.assertArrayEquals(map.entrySet().toArray(), backUp.entrySet().toArray());
+    }
+
+    private List<Cell> getTestCells(){
+        List<Cell> cells = new ArrayList<>();
+        cells.add(new Cell(BanknoteFaceValue.HUNDRED, 10));
+        cells.add(new Cell(BanknoteFaceValue.THOUSAND, 2));
+        cells.add(new Cell(BanknoteFaceValue.THOUSAND5,5));
+        return cells;
+    }
+
+    @Test
+    public void initTest() throws NoSuchFieldException, IllegalAccessException {
+        ATM atm = new ATM(getTestCells());
+        Map<BanknoteFaceValue, Integer> map = getMap(atm);
+        Map<BanknoteFaceValue, Integer> backUp = getMomentoMap(atm);
+        Assert.assertArrayEquals(map.entrySet().toArray(), backUp.entrySet().toArray());
+    }
+
+
+    @Test
+    public void restoreTest() throws NoSuchFieldException, IllegalAccessException {
+        ATM atm = new ATM(getTestCells());
+
+        atm.getMoney(100);
+        atm.getMoney(300);
+        atm.getMoney(1000);
+        atm.restore();
+        Map<BanknoteFaceValue, Integer> map = getMap(atm);
+
+        Assert.assertEquals(map.get(BanknoteFaceValue.HUNDRED), new Integer(10));
+        Assert.assertEquals(map.get(BanknoteFaceValue.THOUSAND), new Integer(2));
 
     }
 

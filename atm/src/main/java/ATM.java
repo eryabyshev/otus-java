@@ -1,23 +1,45 @@
+package main.java;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.*;
 
 public class ATM {
 
     private Map<BanknoteFaceValue, Integer> money = new HashMap<BanknoteFaceValue, Integer>();
+    private Map<BanknoteFaceValue, Integer> backUp = new HashMap<>();
 
 
     public ATM(){
-        money.put(BanknoteFaceValue.HUNDRED, 0);
-        money.put(BanknoteFaceValue.HUNDRED5, 0);
-        money.put(BanknoteFaceValue.THOUSAND, 0);
-        money.put(BanknoteFaceValue.THOUSAND5, 0);
+        initAtmZero(money);
+        initAtmZero(backUp);
     }
+
+    private static void initAtmZero(Map<BanknoteFaceValue, Integer> map){
+        map.put(BanknoteFaceValue.HUNDRED, 0);
+        map.put(BanknoteFaceValue.HUNDRED5, 0);
+        map.put(BanknoteFaceValue.THOUSAND, 0);
+        map.put(BanknoteFaceValue.THOUSAND5, 0);
+    }
+
+    private static void initAtm(Map<BanknoteFaceValue, Integer> map, List<Cell> cells){
+        for (Cell cell : cells)
+            map.put(cell.getName(), cell.getCount());
+    }
+
+
+    public ATM(List<Cell> cells){
+        initAtm(money, cells);
+        initAtm(backUp, cells);
+    }
+
+
+    public void restore(){
+        money = new HashMap<>();
+        backUp.forEach((key, value) -> money.put(key, value));
+    }
+
 
 
     public void takeMoney(BanknoteFaceValue input){
