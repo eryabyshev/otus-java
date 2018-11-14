@@ -3,6 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
 
 
     <!-- Project Object Model -->
@@ -16,6 +17,9 @@
             <url>https://github.com/evgenyrybishew</url>
         </developer>
     </developers>
+    <modules>
+        <module>MemoryMeasurement</module>
+    </modules>
 
     <groupId>ru.evgeny</groupId>
     <artifactId>maven</artifactId>
@@ -78,6 +82,29 @@
                             <mainClass>${my.main.class}</mainClass>
                         </manifest>
                     </archive>
+                </configuration>
+            </plugin>
+
+
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>proguard</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <options>
+                        <option>-keep public class ${my.main.class} { public static *; }</option>
+                        <option>-dontwarn</option>
+                    </options>
+                    <libs>
+                        <lib>${java.home}/lib/rt.jar</lib>
+                    </libs>
                 </configuration>
             </plugin>
 
